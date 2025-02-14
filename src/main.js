@@ -24,45 +24,34 @@ document.querySelector("#app").innerHTML = `
       <button class="btn btn--roll">🎲 Roll dice</button>
       <button class="btn btn--hold">📥 Hold</button>
     </main>
-
 `;
 
-// variables de estado en JS y selectores DOMXS
-
-// activePlayer -> variable de estado en JS
+// variables de estado en JS y selectores DOM
 const sectionPlayer0 = document.querySelector(".player--0");
 const sectionPlayer1 = document.querySelector(".player--1");
-// score = [0,0] -> variable de estado en JS
 const score0 = document.querySelector("#score--0");
 const score1 = document.querySelector("#score--1");
-
-// current -> variable de estado en JS
 const currentScore0 = document.querySelector("#current--0");
 const currentScore1 = document.querySelector("#current--1");
 
 const btnNew = document.querySelector(".btn--new");
 const btnHold = document.querySelector(".btn--hold");
 const btnRoll = document.querySelector(".btn--roll");
-
 const imgDice = document.querySelector(".dice");
 
 let score, currentScore, activePlayer;
 
 const initData = () => {
-  // init state variables
   score = [0, 0];
   currentScore = 0;
   activePlayer = 0;
-  // init DOM elements
-  console.log(sectionPlayer0, "sectionPlayer0");
-  console.log(score0, "score0");
-  console.log(score1, "score1");
-  console.log(currentScore0, "currentScore0");
-  console.log(currentScore1, "currentScore1");
   score0.textContent = 0;
   score1.textContent = 0;
   currentScore0.textContent = 0;
   currentScore1.textContent = 0;
+  imgDice.classList.add("hidden");
+  btnRoll.disabled = false;
+  btnHold.disabled = false;
 };
 
 initData();
@@ -70,22 +59,58 @@ initData();
 btnRoll.addEventListener("click", throwDice);
 
 function throwDice() {
-  //generar un numero de 1 al 6
   const dice = Math.trunc(Math.random() * 6) + 1;
   imgDice.src = `dice-${dice}.png`;
   imgDice.classList.remove("hidden");
-  //si no es 1
-  if (dice !== 1) {
-    currentScore += dice;
-    document.getElementById(`current--${activePlayer}`).textContent =
-      currentScore;
-    //si es
+  if (dice !== 1) updateCurrentScore(dice);
+  else switchPlayer();
+}
+
+function updateCurrentScore(diceNumber) {
+  currentScore += diceNumber;
+  if (activePlayer === 0) {
+    currentScore0.textContent = currentScore;
   } else {
-    currentScore = 0;
-    document.getElementById(`current--${activePlayer}`).textContent =
-      currentScore;
-    activePlayer = activePlayer === 0 ? 1 : 0;
-    sectionPlayer0.classList.toggle("player--active");
-    sectionPlayer1.classList.toggle("player--active");
+    currentScore1.textContent = currentScore;
   }
 }
+
+function switchPlayer() {
+  activePlayer = activePlayer === 0 ? 1 : 0;
+  currentScore = 0;
+  currentScore0.textContent = 0;
+  currentScore1.textContent = 0;
+  sectionPlayer0.classList.toggle("player--active");
+  sectionPlayer1.classList.toggle("player--active");
+}
+
+function hold() {
+  if (activePlayer === 0) {
+    score[0] += currentScore;
+    score0.textContent = score[0];
+    if (score[0] >= 100) endGame(0);
+  } else {
+    score[1] += currentScore;
+    score1.textContent = score[1];
+    if (score[1] >= 100) endGame(1);
+  }
+  currentScore = 0;
+  currentScore0.textContent = currentScore;
+  currentScore1.textContent = currentScore;
+  switchPlayer();
+}
+
+function endGame(winner) {
+  imgDice.classList.add("hidden");
+  btnRoll.disabled = true;
+  btnHold.disabled = true;
+  alert(`Player ${winner + 1} wins!`);
+}
+
+btnHold.addEventListener("click", hold);
+
+function newGame() {
+  initData();
+}
+
+btnNew.addEventListener("click", newGame);
