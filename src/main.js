@@ -66,3 +66,26 @@ const initData = () => {
 };
 
 initData();
+
+btnRoll.addEventListener("click", throwDice);
+
+function throwDice() {
+  //generar un numero de 1 al 6
+  const dice = Math.trunc(Math.random() * 6) + 1;
+  imgDice.src = `dice-${dice}.png`;
+  imgDice.classList.remove("hidden");
+  //si no es 1
+  if (dice !== 1) {
+    currentScore += dice;
+    document.getElementById(`current--${activePlayer}`).textContent =
+      currentScore;
+    //si es
+  } else {
+    currentScore = 0;
+    document.getElementById(`current--${activePlayer}`).textContent =
+      currentScore;
+    activePlayer = activePlayer === 0 ? 1 : 0;
+    sectionPlayer0.classList.toggle("player--active");
+    sectionPlayer1.classList.toggle("player--active");
+  }
+}
